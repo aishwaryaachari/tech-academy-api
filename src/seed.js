@@ -161,48 +161,56 @@ const coursesData = [
   },
 ];
 
-const seed = async () => {
+const seedIfNeeded = async () => {
   try {
-    await connectDB();
-    console.log('✅ Database connected.');
+    const existingAdmin = await User.findOne({ email: 'admin@techacademy.com' });
 
-    // Clear existing data
-    await User.deleteMany({});
-    await Course.deleteMany({});
-    await Chapter.deleteMany({});
-    await Enrollment.deleteMany({});
-    await ChapterCompletion.deleteMany({});
-    console.log('✅ Collections cleared.');
+    if (existingAdmin) {
+      console.log('✅ Users already exist, skipping seed');
+      return;
+    }
+
+    console.log('🌱 Seeding database...');
 
     // Admin
     const adminPassword = await bcrypt.hash('admin123', 12);
-    await User.create({ name: 'Admin User', email: 'admin@techacademy.com', password: adminPassword, role: 'admin' });
+    await User.create({
+      name: 'Admin User',
+      email: 'admin@techacademy.com',
+      password: adminPassword,
+      role: 'admin',
+    });
     console.log('✅ Admin — admin@techacademy.com / admin123');
 
     // Demo student
     const studentPassword = await bcrypt.hash('student123', 12);
-    await User.create({ name: 'Demo Student', email: 'student@techacademy.com', password: studentPassword, role: 'student' });
+    await User.create({
+      name: 'Demo Student',
+      email: 'student@techacademy.com',
+      password: studentPassword,
+      role: 'student',
+    });
     console.log('✅ Student — student@techacademy.com / student123');
 
     // Courses + Chapters
     for (const data of coursesData) {
       const { chapters, ...courseFields } = data;
       const course = await Course.create(courseFields);
-      
-      const chaptersWithIds = chapters.map(ch => ({
+
+      const chaptersWithIds = chapters.map((ch) => ({
         ...ch,
-        courseId: course._id
+        courseId: course._id,
       }));
-      
+
       await Chapter.insertMany(chaptersWithIds);
     }
-    
+
     console.log(`✅ ${coursesData.length} courses seeded with chapters.`);
-    console.log('\n🎉 Database seeded successfully!');
+    console.log('\n🎉 Seed completed');
   } catch (error) {
     console.error('❌ Seed failed:', error);
-    throw error;
+    // Don't throw here to avoid crashing the server if seeding fails on startup
   }
 };
 
-module.exports = seed;
+module.exports = seedIfNeeded;
