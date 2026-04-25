@@ -22,10 +22,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ─── Routes ───────────────────────────────────────────────────
+// Support both /api/path and /path for maximum compatibility
 app.use('/api/auth', authRoutes);
+app.use('/auth', authRoutes);
+
 app.use('/api/courses', courseRoutes);
+app.use('/courses', courseRoutes);
+
 app.use('/api/enrollments', enrollmentRoutes);
+app.use('/enrollments', enrollmentRoutes);
+
 app.use('/api/chapters', chapterRoutes);
+app.use('/chapters', chapterRoutes);
 
 // ─── Health Check ─────────────────────────────────────────────
 app.get('/', (req, res) => {
