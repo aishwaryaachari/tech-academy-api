@@ -199,11 +199,10 @@ const seed = async () => {
     
     console.log(`✅ ${coursesData.length} courses seeded with chapters.`);
     console.log('\n🎉 Database seeded successfully!');
-    process.exit(0);
   } catch (error) {
     console.error('❌ Seed failed:', error);
-    process.exit(1);
+    throw error;
   }
 };
 
-seed();
+module.exports = seed;

@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/database');
+const seed = require('./seed');
 
 // Route imports
 const authRoutes = require('./routes/auth');
@@ -54,6 +55,10 @@ app.use((err, req, res, next) => {
 const startServer = async () => {
   try {
     await connectDB();
+
+    if (process.env.RUN_SEED === "true") {
+      await seed();
+    }
 
     app.listen(PORT, () => {
       console.log(`🚀 Tech Academy API running on port ${PORT}`);
